@@ -1,0 +1,19 @@
+
+<!doctype html><html><head><meta charset="utf-8"><title>Dashboard</title>
+<style>body{font-family:sans-serif;max-width:900px;margin:2rem auto}</style></head>
+<body>
+<h1>Live Dashboard (Demo)</h1>
+<p>Open this while filling a survey to see updates.</p>
+<pre id="out">Loading...</pre>
+<script>
+async function tick(){
+  try {
+    const r = await fetch('/api/responses/survey/1/summary');
+    const data = await r.json();
+    document.getElementById('out').textContent = JSON.stringify(data,null,2);
+  } catch(e){}
+  setTimeout(tick, 2000);
+}
+tick();
+</script>
+</body></html>

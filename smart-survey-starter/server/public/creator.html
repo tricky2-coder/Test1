@@ -1,0 +1,17 @@
+
+<!doctype html><html><head><meta charset="utf-8"><title>Creator</title>
+<style>body{font-family:sans-serif;max-width:900px;margin:2rem auto}</style></head>
+<body>
+<h1>Survey Creator</h1>
+<input id="prompt" placeholder="e.g., schools in Mumbai" style="width:60%">
+<button id="gen">Generate via AI</button>
+<div id="status"></div>
+<script>
+document.getElementById('gen').onclick = async () => {
+  const prompt = document.getElementById('prompt').value || 'schools in Mumbai';
+  const r = await fetch('/api/surveys/generate', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
+  const data = await r.json();
+  document.getElementById('status').innerHTML = 'Created survey ID: '+data.survey_id+' ('+data.title+')';
+};
+</script>
+</body></html>

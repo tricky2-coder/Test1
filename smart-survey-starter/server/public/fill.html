@@ -1,0 +1,35 @@
+
+<!doctype html><html><head><meta charset="utf-8"><title>Fill Survey</title>
+<style>body{font-family:sans-serif;max-width:700px;margin:2rem auto}</style></head>
+<body>
+<h1>Fill Survey</h1>
+<label>Survey ID: <input id="sid" value="1"></label>
+<button id="start">Start</button>
+<div id="q"></div>
+<script>
+let responseId=null; let questions=[]; let idx=0;
+async function loadSurvey(id){
+  const r = await fetch('/api/surveys/'+id);
+  const data = await r.json();
+  questions = data.questions;
+}
+document.getElementById('start').onclick = async () => {
+  const sid = document.getElementById('sid').value;
+  await loadSurvey(sid);
+  const r = await fetch('/api/responses/'+sid+'/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});
+  const resp = await r.json(); responseId = resp.id; idx=0; showQ();
+};
+async function showQ(){
+  if (idx>=questions.length){ await fetch('/api/responses/'+responseId+'/submit',{method:'POST'}); document.getElementById('q').innerHTML='Thanks!'; return; }
+  const q = questions[idx];
+  const el = document.createElement('div');
+  el.innerHTML = '<p><b>Q'+(idx+1)+':</b> '+(q.text.en||'Question')+'</p><input id="ans"> <button id="next">Next</button>';
+  document.getElementById('q').innerHTML=''; document.getElementById('q').appendChild(el);
+  document.getElementById('next').onclick = async () => {
+    const val = document.getElementById('ans').value;
+    await fetch('/api/responses/'+responseId+'/answer',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question_id:q.id, answer_text:val})});
+    idx++; showQ();
+  }
+}
+</script>
+</body></html>
